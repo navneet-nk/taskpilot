@@ -19,6 +19,14 @@
       <input id="title" type="text" placeholder="New task..." required>
       <button type="submit">Add</button>
     </form>
+    <div class="toolbar">
+      <input id="search" type="text" placeholder="Search...">
+      <select id="status">
+        <option value="">All</option>
+        <option value="pending">Pending</option>
+        <option value="done">Done</option>
+      </select>
+    </div>
     <ul id="task-list" class="task-list"></ul>
     <p id="empty" class="empty">No tasks yet.</p>
   </main>

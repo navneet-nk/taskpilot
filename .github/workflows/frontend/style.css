@@ -15,3 +15,6 @@ button { padding: 10px 14px; border: 0; border-radius: 6px; background: #2563eb;
 .task .title { flex: 1; }
 .task.done .title { text-decoration: line-through; color: #888; }
 .empty { text-align: center; color: #888; }
+.toolbar { display: flex; gap: 8px; margin-bottom: 12px; }
+.toolbar input { flex: 1; padding: 8px; border: 1px solid #ccc; border-radius: 6px; }
+.toolbar select { padding: 8px; border-radius: 6px; }
