@@ -3,12 +3,14 @@ import argparse
 from taskpilot import storage
 
 
-def add_task(title):
+def add_task(title, priority="medium", due=None):
     tasks = storage.load()
     task = {
         "id": max((t["id"] for t in tasks), default=0) + 1,
         "title": title,
         "done": False,
+        "priority": priority,
+        "due": due,
     }
     tasks.append(task)
     storage.save(tasks)
@@ -41,6 +43,10 @@ def build_parser():
 
     p_add = sub.add_parser("add", help="Add a new task")
     p_add.add_argument("title")
+
+    p_add.add_argument("--priority", choices=["low", "medium", "high"], default="medium")
+    p_add.add_argument("--due", help="Due date, YYYY-MM-DD")
+
     sub.add_parser("list", help="Show all tasks")
     p_done = sub.add_parser("done", help="Mark a task as done")
     p_done.add_argument("id", type=int)
@@ -53,7 +59,7 @@ def build_parser():
 def main(argv=None):
     args = build_parser().parse_args(argv)
     if args.command == "add":
-        task = add_task(args.title)
+        task = add_task(args.title, args.priority, args.due)
         print(f"Added #{task['id']}: {task['title']}")
         
     elif args.command == "list":
@@ -62,8 +68,9 @@ def main(argv=None):
             print("No tasks yet.")
         for t in tasks:
             mark = "x" if t["done"] else " "
-            print(f"[{mark}] #{t['id']} {t['title']}")
-            
+            due = f" (due {t['due']})" if t.get("due") else ""
+            print(f"[{mark}] #{t['id']} [{t.get('priority', 'medium')}] {t['title']}{due}")
+
     elif args.command == "done":
         print("Done!" if complete_task(args.id) else "Task not found.")
     elif args.command == "delete":
