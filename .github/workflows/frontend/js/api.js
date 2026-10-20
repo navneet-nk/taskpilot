@@ -12,10 +12,10 @@ const api = {
   listTasks() {
     return load();
   },
-  addTask(title) {
+  addTask(title, priority = "medium", due = null) {
     const tasks = load();
     const id = tasks.reduce((max, t) => Math.max(max, t.id), 0) + 1;
-    const task = { id, title, done: false };
+    const task = { id, title, done: false, priority, due };
     tasks.push(task);
     save(tasks);
     return task;
