@@ -17,6 +17,24 @@ def add_task(title):
 def list_tasks():
     return storage.load()
 
+def complete_task(task_id):
+    tasks = storage.load()
+    for t in tasks:
+        if t["id"] == task_id:
+            t["done"] = True
+            storage.save(tasks)
+            return True
+    return False
+
+
+def delete_task(task_id):
+    tasks = storage.load()
+    remaining = [t for t in tasks if t["id"] != task_id]
+    if len(remaining) == len(tasks):
+        return False
+    storage.save(remaining)
+    return True
+
 def build_parser():
     parser = argparse.ArgumentParser(prog="taskpilot")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -24,6 +42,11 @@ def build_parser():
     p_add = sub.add_parser("add", help="Add a new task")
     p_add.add_argument("title")
     sub.add_parser("list", help="Show all tasks")
+    p_done = sub.add_parser("done", help="Mark a task as done")
+    p_done.add_argument("id", type=int)
+
+    p_del = sub.add_parser("delete", help="Delete a task")
+    p_del.add_argument("id", type=int)
     return parser
 
 
@@ -40,6 +63,11 @@ def main(argv=None):
         for t in tasks:
             mark = "x" if t["done"] else " "
             print(f"[{mark}] #{t['id']} {t['title']}")
+            
+    elif args.command == "done":
+        print("Done!" if complete_task(args.id) else "Task not found.")
+    elif args.command == "delete":
+        print("Deleted." if delete_task(args.id) else "Task not found.")
 
 
 if __name__ == "__main__":
