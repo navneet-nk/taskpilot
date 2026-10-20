@@ -16,8 +16,16 @@ def add_task(title, priority="medium", due=None):
     storage.save(tasks)
     return task
 
-def list_tasks():
-    return storage.load()
+def list_tasks(status=None, search=None):
+    tasks = storage.load()
+    if status == "done":
+        tasks = [t for t in tasks if t["done"]]
+    elif status == "pending":
+        tasks = [t for t in tasks if not t["done"]]
+    if search:
+        tasks = [t for t in tasks if search.lower() in t["title"].lower()]
+    order = {"high": 0, "medium": 1, "low": 2}
+    return sorted(tasks, key=lambda t: order.get(t.get("priority", "medium"), 1))
 
 def complete_task(task_id):
     tasks = storage.load()
@@ -47,7 +55,10 @@ def build_parser():
     p_add.add_argument("--priority", choices=["low", "medium", "high"], default="medium")
     p_add.add_argument("--due", help="Due date, YYYY-MM-DD")
 
-    sub.add_parser("list", help="Show all tasks")
+    p_list = sub.add_parser("list", help="Show tasks")
+    p_list.add_argument("--status", choices=["done", "pending"])
+    p_list.add_argument("--search")
+
     p_done = sub.add_parser("done", help="Mark a task as done")
     p_done.add_argument("id", type=int)
 
@@ -63,7 +74,7 @@ def main(argv=None):
         print(f"Added #{task['id']}: {task['title']}")
         
     elif args.command == "list":
-        tasks = list_tasks()
+        tasks = list_tasks(args.status, args.search)
         if not tasks:
             print("No tasks yet.")
         for t in tasks:
