@@ -4,9 +4,11 @@ const list = document.getElementById("task-list");
 const empty = document.getElementById("empty");
 const priorityInput = document.getElementById("priority");
 const dueInput = document.getElementById("due");
+const searchInput = document.getElementById("search");
+const statusSelect = document.getElementById("status");
 
 function render() {
-  const tasks = api.listTasks();
+    const tasks = api.listTasks({ status: statusSelect.value, search: searchInput.value });
   list.innerHTML = "";
   empty.style.display = tasks.length ? "none" : "block";
 
@@ -54,5 +56,6 @@ form.addEventListener("submit", (e) => {
   dueInput.value = "";
   render();
 });
-
+searchInput.addEventListener("input", render);
+statusSelect.addEventListener("change", render);
 render();

@@ -9,8 +9,15 @@ function save(tasks) {
 }
 
 const api = {
-  listTasks() {
-    return load();
+  listTasks({ status, search } = {}) {
+    let tasks = load();
+    if (status === "done") tasks = tasks.filter((t) => t.done);
+    if (status === "pending") tasks = tasks.filter((t) => !t.done);
+    if (search) {
+      tasks = tasks.filter((t) => t.title.toLowerCase().includes(search.toLowerCase()));
+    }
+    const order = { high: 0, medium: 1, low: 2 };
+    return tasks.sort((a, b) => (order[a.priority] ?? 1) - (order[b.priority] ?? 1));
   },
   addTask(title, priority = "medium", due = null) {
     const tasks = load();
