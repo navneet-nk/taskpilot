@@ -20,4 +20,19 @@ const api = {
     save(tasks);
     return task;
   },
+  completeTask(id) {
+    const tasks = load();
+    const t = tasks.find((x) => x.id === id);
+    if (!t) return false;
+    t.done = !t.done;
+    save(tasks);
+    return true;
+  },
+  deleteTask(id) {
+    const tasks = load();
+    const rest = tasks.filter((x) => x.id !== id);
+    if (rest.length === tasks.length) return false;
+    save(rest);
+    return true;
+  },
 };
