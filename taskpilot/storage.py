@@ -22,6 +22,15 @@ def connect():
         )
         """
     )
+    conn.execute(
+        """
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT NOT NULL UNIQUE,
+            password_hash TEXT NOT NULL
+        )
+        """
+    )
     return conn
 
 
@@ -67,3 +76,23 @@ def delete(task_id):
         with conn:
             cur = conn.execute("DELETE FROM tasks WHERE id = ?", (task_id,))
         return cur.rowcount > 0
+    
+def create_user(username, password_hash):
+    with closing(connect()) as conn:
+        try:
+            with conn:
+                cur = conn.execute(
+                    "INSERT INTO users (username, password_hash) VALUES (?, ?)",
+                    (username, password_hash),
+                )
+        except sqlite3.IntegrityError:
+            return None
+        return cur.lastrowid
+
+
+def get_user(username):
+    with closing(connect()) as conn:
+        row = conn.execute(
+            "SELECT * FROM users WHERE username = ?", (username,)
+        ).fetchone()
+    return dict(row) if row else None
