@@ -1,3 +1,13 @@
+if (!getToken()) {
+  window.location.href = "login.html";
+}
+
+document.getElementById("user").textContent = getUsername() || "";
+document.getElementById("logout").addEventListener("click", () => {
+  clearSession();
+  window.location.href = "login.html";
+});
+
 const form = document.getElementById("add-form");
 const input = document.getElementById("title");
 const priorityInput = document.getElementById("priority");
