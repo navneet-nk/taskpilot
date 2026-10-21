@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - TaskPilot</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="container auth-card">
+    <h1>Login</h1>
+    <form id="login-form" class="auth-form">
+      <input id="username" type="text" placeholder="Username" required autocomplete="username">
+      <input id="password" type="password" placeholder="Password" required autocomplete="current-password">
+      <button type="submit">Login</button>
+      <p id="error" class="error"></p>
+    </form>
+    <p class="switch">Account nahi hai? <a href="register.html">Register karo</a></p>
+  </main>
+  <script src="js/auth.js"></script>
+  <script>
+    if (getToken()) window.location.href = "index.html";
+
+    document.getElementById("login-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const error = document.getElementById("error");
+      error.textContent = "";
+      try {
+        const data = await authRequest(
+          "/login",
+          document.getElementById("username").value,
+          document.getElementById("password").value
+        );
+        saveSession(data.token, data.username);
+        window.location.href = "index.html";
+      } catch (err) {
+        error.textContent = err.message;
+      }
+    });
+  </script>
+</body>
+</html>

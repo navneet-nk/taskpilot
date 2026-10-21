@@ -18,3 +18,9 @@ button { padding: 10px 14px; border: 0; border-radius: 6px; background: #2563eb;
 .toolbar { display: flex; gap: 8px; margin-bottom: 12px; }
 .toolbar input { flex: 1; padding: 8px; border: 1px solid #ccc; border-radius: 6px; }
 .toolbar select { padding: 8px; border-radius: 6px; }
+.auth-card { max-width: 380px; background: #fff; padding: 24px; border-radius: 12px; }
+.auth-form { display: flex; flex-direction: column; gap: 10px; }
+.auth-form input { padding: 10px; border: 1px solid #ccc; border-radius: 6px; }
+.error { color: #b91c1c; font-size: 14px; min-height: 18px; margin: 0; }
+.switch { text-align: center; font-size: 14px; }
+.switch a { color: #2563eb; }

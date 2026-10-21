@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register - TaskPilot</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="container auth-card">
+    <h1>Register</h1>
+    <form id="register-form" class="auth-form">
+      <input id="username" type="text" placeholder="Username (min 3)" required autocomplete="username">
+      <input id="password" type="password" placeholder="Password (min 6)" required autocomplete="new-password">
+      <input id="confirm" type="password" placeholder="Confirm password" required autocomplete="new-password">
+      <button type="submit">Create account</button>
+      <p id="error" class="error"></p>
+    </form>
+    <p class="switch">Pehle se account hai? <a href="login.html">Login karo</a></p>
+  </main>
+  <script src="js/auth.js"></script>
+  <script>
+    if (getToken()) window.location.href = "index.html";
+
+    document.getElementById("register-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const error = document.getElementById("error");
+      error.textContent = "";
+      const password = document.getElementById("password").value;
+      if (password !== document.getElementById("confirm").value) {
+        error.textContent = "Dono passwords same hone chahiye.";
+        return;
+      }
+      try {
+        const data = await authRequest(
+          "/register",
+          document.getElementById("username").value,
+          password
+        );
+        saveSession(data.token, data.username);
+        window.location.href = "index.html";
+      } catch (err) {
+        error.textContent = err.message;
+      }
+    });
+  </script>
+</body>
+</html>
