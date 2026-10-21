@@ -1,10 +1,16 @@
-const BASE_URL = "http://127.0.0.1:8000";
-
 async function request(path, options = {}) {
-  const res = await fetch(BASE_URL + path, {
-    headers: { "Content-Type": "application/json" },
+  const res = await fetch(API_URL + path, {
     ...options,
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + getToken(),
+    },
   });
+  if (res.status === 401) {
+    clearSession();
+    window.location.href = "login.html";
+    throw new Error("Session expired");
+  }
   if (!res.ok) throw new Error("Request failed: " + res.status);
   return res.status === 204 ? null : res.json();
 }
