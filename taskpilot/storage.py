@@ -54,7 +54,14 @@ def mark_done(task_id):
             cur = conn.execute("UPDATE tasks SET done = 1 WHERE id = ?", (task_id,))
         return cur.rowcount > 0
 
-
+def set_done(task_id, done):
+    with closing(connect()) as conn:
+        with conn:
+            cur = conn.execute(
+                "UPDATE tasks SET done = ? WHERE id = ?", (int(done), task_id)
+            )
+        return cur.rowcount > 0
+    
 def delete(task_id):
     with closing(connect()) as conn:
         with conn:
