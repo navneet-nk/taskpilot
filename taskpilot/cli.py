@@ -4,20 +4,11 @@ from taskpilot import storage
 
 
 def add_task(title, priority="medium", due=None):
-    tasks = storage.load()
-    task = {
-        "id": max((t["id"] for t in tasks), default=0) + 1,
-        "title": title,
-        "done": False,
-        "priority": priority,
-        "due": due,
-    }
-    tasks.append(task)
-    storage.save(tasks)
-    return task
+    return storage.insert(title, priority, due)
+
 
 def list_tasks(status=None, search=None):
-    tasks = storage.load()
+    tasks = storage.get_all()
     if status == "done":
         tasks = [t for t in tasks if t["done"]]
     elif status == "pending":
@@ -27,23 +18,14 @@ def list_tasks(status=None, search=None):
     order = {"high": 0, "medium": 1, "low": 2}
     return sorted(tasks, key=lambda t: order.get(t.get("priority", "medium"), 1))
 
+
 def complete_task(task_id):
-    tasks = storage.load()
-    for t in tasks:
-        if t["id"] == task_id:
-            t["done"] = True
-            storage.save(tasks)
-            return True
-    return False
+    return storage.mark_done(task_id)
+
 
 
 def delete_task(task_id):
-    tasks = storage.load()
-    remaining = [t for t in tasks if t["id"] != task_id]
-    if len(remaining) == len(tasks):
-        return False
-    storage.save(remaining)
-    return True
+    return storage.delete(task_id)
 
 def build_parser():
     parser = argparse.ArgumentParser(prog="taskpilot")
