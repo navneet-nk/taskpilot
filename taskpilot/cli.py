@@ -3,12 +3,12 @@ import argparse
 from taskpilot import storage
 
 
-def add_task(title, priority="medium", due=None):
-    return storage.insert(title, priority, due)
+def add_task(title, priority="medium", due=None, user_id=None):
+    return storage.insert(title, priority, due, user_id)
 
 
-def list_tasks(status=None, search=None):
-    tasks = storage.get_all()
+def list_tasks(status=None, search=None, user_id=None):
+    tasks = storage.get_all(user_id)
     if status == "done":
         tasks = [t for t in tasks if t["done"]]
     elif status == "pending":
@@ -18,14 +18,12 @@ def list_tasks(status=None, search=None):
     order = {"high": 0, "medium": 1, "low": 2}
     return sorted(tasks, key=lambda t: order.get(t.get("priority", "medium"), 1))
 
-
-def complete_task(task_id):
-    return storage.mark_done(task_id)
-
+def complete_task(task_id, user_id=None):
+    return storage.mark_done(task_id, user_id)
 
 
-def delete_task(task_id):
-    return storage.delete(task_id)
+def delete_task(task_id, user_id=None):
+    return storage.delete(task_id, user_id)
 
 def build_parser():
     parser = argparse.ArgumentParser(prog="taskpilot")
