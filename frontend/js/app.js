@@ -1,15 +1,28 @@
 const form = document.getElementById("add-form");
 const input = document.getElementById("title");
-const list = document.getElementById("task-list");
-const empty = document.getElementById("empty");
 const priorityInput = document.getElementById("priority");
 const dueInput = document.getElementById("due");
 const searchInput = document.getElementById("search");
 const statusSelect = document.getElementById("status");
+const list = document.getElementById("task-list");
+const empty = document.getElementById("empty");
 
-function render() {
-    const tasks = api.listTasks({ status: statusSelect.value, search: searchInput.value });
+async function render() {
+  let tasks;
+  try {
+    tasks = await api.listTasks({
+      status: statusSelect.value,
+      search: searchInput.value,
+    });
+  } catch (err) {
+    list.innerHTML = "";
+    empty.style.display = "block";
+    empty.textContent = "Server se connect nahi ho paaya. Kya API chal rahi hai?";
+    return;
+  }
+
   list.innerHTML = "";
+  empty.textContent = "No tasks yet.";
   empty.style.display = tasks.length ? "none" : "block";
 
   tasks.forEach((t) => {
@@ -19,8 +32,8 @@ function render() {
     const check = document.createElement("input");
     check.type = "checkbox";
     check.checked = t.done;
-    check.addEventListener("change", () => {
-      api.completeTask(t.id);
+    check.addEventListener("change", async () => {
+      await api.completeTask(t.id, check.checked);
       render();
     });
 
@@ -37,8 +50,8 @@ function render() {
 
     const del = document.createElement("button");
     del.textContent = "Delete";
-    del.addEventListener("click", () => {
-      api.deleteTask(t.id);
+    del.addEventListener("click", async () => {
+      await api.deleteTask(t.id);
       render();
     });
 
@@ -47,15 +60,17 @@ function render() {
   });
 }
 
-form.addEventListener("submit", (e) => {
+form.addEventListener("submit", async (e) => {
   e.preventDefault();
   const title = input.value.trim();
   if (!title) return;
-  api.addTask(title, priorityInput.value, dueInput.value || null);
+  await api.addTask(title, priorityInput.value, dueInput.value || null);
   input.value = "";
   dueInput.value = "";
   render();
 });
+
 searchInput.addEventListener("input", render);
 statusSelect.addEventListener("change", render);
+
 render();
