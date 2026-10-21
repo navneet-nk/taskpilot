@@ -1,45 +1,35 @@
-const KEY = "taskpilot_tasks";
+const BASE_URL = "http://127.0.0.1:8000";
 
-function load() {
-  return JSON.parse(localStorage.getItem(KEY) || "[]");
-}
-
-function save(tasks) {
-  localStorage.setItem(KEY, JSON.stringify(tasks));
+async function request(path, options = {}) {
+  const res = await fetch(BASE_URL + path, {
+    headers: { "Content-Type": "application/json" },
+    ...options,
+  });
+  if (!res.ok) throw new Error("Request failed: " + res.status);
+  return res.status === 204 ? null : res.json();
 }
 
 const api = {
   listTasks({ status, search } = {}) {
-    let tasks = load();
-    if (status === "done") tasks = tasks.filter((t) => t.done);
-    if (status === "pending") tasks = tasks.filter((t) => !t.done);
-    if (search) {
-      tasks = tasks.filter((t) => t.title.toLowerCase().includes(search.toLowerCase()));
-    }
-    const order = { high: 0, medium: 1, low: 2 };
-    return tasks.sort((a, b) => (order[a.priority] ?? 1) - (order[b.priority] ?? 1));
+    const params = new URLSearchParams();
+    if (status) params.set("status", status);
+    if (search) params.set("search", search);
+    const qs = params.toString();
+    return request("/tasks" + (qs ? "?" + qs : ""));
   },
   addTask(title, priority = "medium", due = null) {
-    const tasks = load();
-    const id = tasks.reduce((max, t) => Math.max(max, t.id), 0) + 1;
-    const task = { id, title, done: false, priority, due };
-    tasks.push(task);
-    save(tasks);
-    return task;
+    return request("/tasks", {
+      method: "POST",
+      body: JSON.stringify({ title, priority, due }),
+    });
   },
-  completeTask(id) {
-    const tasks = load();
-    const t = tasks.find((x) => x.id === id);
-    if (!t) return false;
-    t.done = !t.done;
-    save(tasks);
-    return true;
+  completeTask(id, done) {
+    return request("/tasks/" + id, {
+      method: "PATCH",
+      body: JSON.stringify({ done }),
+    });
   },
   deleteTask(id) {
-    const tasks = load();
-    const rest = tasks.filter((x) => x.id !== id);
-    if (rest.length === tasks.length) return false;
-    save(rest);
-    return true;
+    return request("/tasks/" + id, { method: "DELETE" });
   },
 };
