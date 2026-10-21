@@ -18,7 +18,8 @@ def connect():
             title TEXT NOT NULL,
             done INTEGER NOT NULL DEFAULT 0,
             priority TEXT NOT NULL DEFAULT 'medium',
-            due TEXT
+            due TEXT,
+            user_id INTEGER
         )
         """
     )
@@ -31,52 +32,62 @@ def connect():
         )
         """
     )
+    cols = [r["name"] for r in conn.execute("PRAGMA table_info(tasks)")]
+    if "user_id" not in cols:
+        conn.execute("ALTER TABLE tasks ADD COLUMN user_id INTEGER")
     return conn
 
 
 def _to_dict(row):
     task = dict(row)
     task["done"] = bool(task["done"])
+    task.pop("user_id", None)
     return task
 
 
-def get_all():
+# user_id=None ka matlab CLI wale tasks. "IS ?" NULL ke saath bhi kaam karta hai.
+def get_all(user_id=None):
     with closing(connect()) as conn:
-        rows = conn.execute("SELECT * FROM tasks").fetchall()
+        rows = conn.execute(
+            "SELECT * FROM tasks WHERE user_id IS ?", (user_id,)
+        ).fetchall()
     return [_to_dict(r) for r in rows]
 
 
-def insert(title, priority, due):
+def insert(title, priority, due, user_id=None):
     with closing(connect()) as conn:
         with conn:
             cur = conn.execute(
-                "INSERT INTO tasks (title, priority, due) VALUES (?, ?, ?)",
-                (title, priority, due),
+                "INSERT INTO tasks (title, priority, due, user_id) VALUES (?, ?, ?, ?)",
+                (title, priority, due, user_id),
             )
         task_id = cur.lastrowid
     return {"id": task_id, "title": title, "done": False, "priority": priority, "due": due}
 
 
-def mark_done(task_id):
-    with closing(connect()) as conn:
-        with conn:
-            cur = conn.execute("UPDATE tasks SET done = 1 WHERE id = ?", (task_id,))
-        return cur.rowcount > 0
+def mark_done(task_id, user_id=None):
+    return set_done(task_id, True, user_id)
 
-def set_done(task_id, done):
+
+def set_done(task_id, done, user_id=None):
     with closing(connect()) as conn:
         with conn:
             cur = conn.execute(
-                "UPDATE tasks SET done = ? WHERE id = ?", (int(done), task_id)
+                "UPDATE tasks SET done = ? WHERE id = ? AND user_id IS ?",
+                (int(done), task_id, user_id),
             )
         return cur.rowcount > 0
-    
-def delete(task_id):
+
+
+def delete(task_id, user_id=None):
     with closing(connect()) as conn:
         with conn:
-            cur = conn.execute("DELETE FROM tasks WHERE id = ?", (task_id,))
+            cur = conn.execute(
+                "DELETE FROM tasks WHERE id = ? AND user_id IS ?", (task_id, user_id)
+            )
         return cur.rowcount > 0
-    
+
+
 def create_user(username, password_hash):
     with closing(connect()) as conn:
         try:
