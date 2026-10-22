@@ -3,19 +3,41 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login - TaskPilot</title>
+  <title>Log in - TaskPilot</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
-<body>
-  <main class="container auth-card">
-    <h1>Login</h1>
-    <form id="login-form" class="auth-form">
-      <input id="username" type="text" placeholder="Username" required autocomplete="username">
-      <input id="password" type="password" placeholder="Password" required autocomplete="current-password">
-      <button type="submit">Login</button>
-      <p id="error" class="error"></p>
-    </form>
-    <p class="switch">Account nahi hai? <a href="register.html">Register karo</a></p>
+<body class="auth-body">
+  <aside class="auth-aside">
+    <div class="brand"><span class="mark" aria-hidden="true"><i></i><i></i><i></i></span>TaskPilot</div>
+    <div>
+      <h2>Keep every task on the board.</h2>
+      <p>Set a priority and a due date, then tick tasks off as they land.</p>
+    </div>
+    <div class="sample-strips" aria-hidden="true">
+      <div class="sample s1">Send the invoice <small>High</small></div>
+      <div class="sample s2">Book the dentist <small>Medium</small></div>
+      <div class="sample s3 s-done">Buy milk <small>Low</small></div>
+    </div>
+  </aside>
+  <main class="auth-main">
+    <div class="auth-card">
+      <h1>Welcome back</h1>
+      <p class="lead">Log in to see your tasks.</p>
+      <form id="login-form" class="auth-form">
+        <label>Username
+          <input id="username" class="field" type="text" required autocomplete="username">
+        </label>
+        <label>Password
+          <input id="password" class="field" type="password" required autocomplete="current-password">
+        </label>
+        <p id="error" class="error" role="alert"></p>
+        <button type="submit" class="btn">Log in</button>
+      </form>
+      <p class="switch">New here? <a href="register.html">Create an account</a></p>
+    </div>
   </main>
   <script src="js/auth.js"></script>
   <script>
@@ -24,7 +46,9 @@
     document.getElementById("login-form").addEventListener("submit", async (e) => {
       e.preventDefault();
       const error = document.getElementById("error");
+      const button = e.target.querySelector("button");
       error.textContent = "";
+      button.disabled = true;
       try {
         const data = await authRequest(
           "/login",
@@ -35,6 +59,7 @@
         window.location.href = "index.html";
       } catch (err) {
         error.textContent = err.message;
+        button.disabled = false;
       }
     });
   </script>

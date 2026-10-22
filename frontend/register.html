@@ -3,20 +3,44 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Register - TaskPilot</title>
+  <title>Create account - TaskPilot</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
-<body>
-  <main class="container auth-card">
-    <h1>Register</h1>
-    <form id="register-form" class="auth-form">
-      <input id="username" type="text" placeholder="Username (min 3)" required autocomplete="username">
-      <input id="password" type="password" placeholder="Password (min 6)" required autocomplete="new-password">
-      <input id="confirm" type="password" placeholder="Confirm password" required autocomplete="new-password">
-      <button type="submit">Create account</button>
-      <p id="error" class="error"></p>
-    </form>
-    <p class="switch">Pehle se account hai? <a href="login.html">Login karo</a></p>
+<body class="auth-body">
+  <aside class="auth-aside">
+    <div class="brand"><span class="mark" aria-hidden="true"><i></i><i></i><i></i></span>TaskPilot</div>
+    <div>
+      <h2>Keep every task on the board.</h2>
+      <p>Set a priority and a due date, then tick tasks off as they land.</p>
+    </div>
+    <div class="sample-strips" aria-hidden="true">
+      <div class="sample s1">Send the invoice <small>High</small></div>
+      <div class="sample s2">Book the dentist <small>Medium</small></div>
+      <div class="sample s3 s-done">Buy milk <small>Low</small></div>
+    </div>
+  </aside>
+  <main class="auth-main">
+    <div class="auth-card">
+      <h1>Create your account</h1>
+      <p class="lead">Your tasks stay private to you.</p>
+      <form id="register-form" class="auth-form">
+        <label>Username (at least 3 characters)
+          <input id="username" class="field" type="text" required minlength="3" autocomplete="username">
+        </label>
+        <label>Password (at least 6 characters)
+          <input id="password" class="field" type="password" required minlength="6" autocomplete="new-password">
+        </label>
+        <label>Confirm password
+          <input id="confirm" class="field" type="password" required autocomplete="new-password">
+        </label>
+        <p id="error" class="error" role="alert"></p>
+        <button type="submit" class="btn">Create account</button>
+      </form>
+      <p class="switch">Already registered? <a href="login.html">Log in</a></p>
+    </div>
   </main>
   <script src="js/auth.js"></script>
   <script>
@@ -25,12 +49,14 @@
     document.getElementById("register-form").addEventListener("submit", async (e) => {
       e.preventDefault();
       const error = document.getElementById("error");
+      const button = e.target.querySelector("button");
       error.textContent = "";
       const password = document.getElementById("password").value;
       if (password !== document.getElementById("confirm").value) {
-        error.textContent = "Dono passwords same hone chahiye.";
+        error.textContent = "The two passwords don't match.";
         return;
       }
+      button.disabled = true;
       try {
         const data = await authRequest(
           "/register",
@@ -41,6 +67,7 @@
         window.location.href = "index.html";
       } catch (err) {
         error.textContent = err.message;
+        button.disabled = false;
       }
     });
   </script>
