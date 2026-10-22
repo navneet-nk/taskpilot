@@ -4,38 +4,56 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TaskPilot</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <main class="container">
-        <header class="topbar">
-      <h1>TaskPilot</h1>
-      <div>
+    <header class="topbar">
+      <div class="brand"><span class="mark" aria-hidden="true"><i></i><i></i><i></i></span>TaskPilot</div>
+      <div class="topbar-user">
         <span id="user"></span>
-        <button id="logout" type="button">Logout</button>
+        <button id="logout" class="btn btn-ghost" type="button">Log out</button>
       </div>
     </header>
-    <select id="priority">
+
+    <section class="intro">
+      <h1 id="greeting">Your tasks</h1>
+      <p id="summary" class="summary" aria-live="polite"></p>
+    </section>
+
+    <form id="add-form" class="add-form">
+      <input id="title" class="field" type="text" placeholder="What needs doing?" aria-label="Task title" required>
+      <select id="priority" class="field" aria-label="Priority">
         <option value="low">Low</option>
         <option value="medium" selected>Medium</option>
         <option value="high">High</option>
-    </select>
-    <input id="due" type="date">
-    <form id="add-form" class="add-form">
-      <input id="title" type="text" placeholder="New task..." required>
-      <button type="submit">Add</button>
-    </form>
-    <div class="toolbar">
-      <input id="search" type="text" placeholder="Search...">
-      <select id="status">
-        <option value="">All</option>
-        <option value="pending">Pending</option>
-        <option value="done">Done</option>
       </select>
+      <input id="due" class="field" type="date" aria-label="Due date">
+      <button type="submit" class="btn">Add task</button>
+    </form>
+
+    <div class="toolbar">
+      <div class="search-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+        <input id="search" class="field" type="search" placeholder="Search tasks" aria-label="Search tasks">
+      </div>
+      <div class="segmented" role="group" aria-label="Filter by status">
+        <button type="button" data-status="" aria-pressed="true">All</button>
+        <button type="button" data-status="pending" aria-pressed="false">Pending</button>
+        <button type="button" data-status="done" aria-pressed="false">Done</button>
+      </div>
+      <input id="status" type="hidden" value="">
     </div>
+
     <ul id="task-list" class="task-list"></ul>
-    <p id="empty" class="empty">No tasks yet.</p>
+    <p id="empty" class="empty">No tasks yet. Add your first task above.</p>
   </main>
+
+  <div id="toast" class="toast" role="status"></div>
+
   <script src="js/auth.js"></script>
   <script src="js/api.js"></script>
   <script src="js/app.js"></script>
